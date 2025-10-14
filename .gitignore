@@ -3,3 +3,4 @@ venv
 .python-version
 .env
 .gitignore
+\calculator\pkg\__pycache__
