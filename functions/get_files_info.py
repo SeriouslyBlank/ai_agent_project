@@ -18,8 +18,6 @@ def get_files_info(working_directory, directory="."):
 		return (f'Error: Cannot list "{directory}" as it is outside the permitted working directory')
 
 
-
-
 	if os.path.isdir(path) == False:
 		return(f'Error: "{path}" is not a directory')
 
@@ -37,7 +35,7 @@ def get_files_info(working_directory, directory="."):
 
 
 	except Exception as e:
-		return f"Error asad : {e}"
+		return f"Error: {e}"
 
 
 
