@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from google import genai
 import sys
 from google.genai import types
+from config import SYS_PROMPT as system_prompt
 
 
 
@@ -43,7 +44,9 @@ def generate_content(ai_model, messages, verbose):
 
 
 	response = client.models.generate_content(
-		model = ai_model, contents = messages, 
+		model = ai_model, contents = messages,
+	    config=types.GenerateContentConfig(system_instruction=system_prompt),
+ 
 	)
 
 	if verbose == True:
