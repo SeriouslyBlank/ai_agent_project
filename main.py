@@ -11,7 +11,7 @@ from functions.write_file import schema_write_file
 from call_function import call_function
 
 
-
+max_iters = 20
 
 
 available_functions = types.Tool(
@@ -60,25 +60,34 @@ messages = [
 
 def generate_content(ai_model, messages, verbose):
 
+	for i in range(0, max_iters):
+		response = client.models.generate_content(
+			model = ai_model, contents = messages,
+		    config=types.GenerateContentConfig(
+	    	tools=[available_functions], system_instruction=system_prompt)
+		)
 
-	response = client.models.generate_content(
-		model = ai_model, contents = messages,
-	    config=types.GenerateContentConfig(
-    	tools=[available_functions], system_instruction=system_prompt)
-	)
+		if verbose == True:
+				print(f"""User prompt: {user_prompt} \n
+					Prompt tokens: {response.usage_metadata.prompt_token_count}
+					Response tokens: {response.usage_metadata.candidates_token_count}
+					""")
 
-	if verbose == True:
-			print(f"""User prompt: {user_prompt} \n
-				Prompt tokens: {response.usage_metadata.prompt_token_count}
-				Response tokens: {response.usage_metadata.candidates_token_count}
-				""")
+		if response.candidates:
+			for candidate in response.candidates:
+				if candidate is None or candidate.content is None:
+					continue
+				messages.append(candidate.content)
 
-	if response.function_calls:
-		for fc in response.function_calls:
-			result = call_function(fc, verbose)
-			print(result)
-	else:
-		print(response.text)
+
+		if response.function_calls:
+			for function_call_part in response.function_calls:
+				result = call_function(function_call_part, verbose)
+				messages.append(result)
+
+		else:
+			print(response.text)
+			return
 
 
 
