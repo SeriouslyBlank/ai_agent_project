@@ -4,7 +4,24 @@ from google import genai
 import sys
 from google.genai import types
 from config import SYS_PROMPT as system_prompt
+from functions.get_files_info import schema_get_files_info
+from functions.get_file_content import schema_get_file_content
+from functions.run_python_file import schema_run_python_file
+from functions.write_file import schema_write_file
 
+
+
+
+
+
+available_functions = types.Tool(
+    function_declarations=[
+        schema_get_files_info,
+        schema_get_file_content,
+        schema_run_python_file,
+        schema_write_file
+    ]
+)
 
 
 
@@ -45,17 +62,35 @@ def generate_content(ai_model, messages, verbose):
 
 	response = client.models.generate_content(
 		model = ai_model, contents = messages,
-	    config=types.GenerateContentConfig(system_instruction=system_prompt),
- 
+	    config=types.GenerateContentConfig(
+    	tools=[available_functions], system_instruction=system_prompt)
 	)
 
-	if verbose == True:
-		print(f"""User prompt: {user_prompt} \n
-			Prompt tokens: {response.usage_metadata.prompt_token_count}
-			Response tokens: {response.usage_metadata.candidates_token_count}
-			""")
+	for fc in response.function_calls or []:
+		name = fc.name
+		args = dict(fc.args)
+
+
+
+	if fc:
+		if verbose == True:
+			print(f"""User prompt: {user_prompt} \n
+				Prompt tokens: {response.usage_metadata.prompt_token_count}
+				Response tokens: {response.usage_metadata.candidates_token_count}
+				""")
+			print(f"Calling function: {fc.name}({fc.args})")
+		else:
+			print(f"Calling function: {fc.name}({fc.args})")
+			print(response.text)
+
 	else:
+		print(f"Calling function: {fc.name}({fc.args})")
 		print(response.text)
+
+
+
+
+	
 
 
 

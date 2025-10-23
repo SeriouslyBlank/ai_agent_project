@@ -1,6 +1,25 @@
 
 import os
 from config import CH_LIMIT
+from google.genai import types
+
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description = "Retrieves the contents of a specified file within the working directory, ensuring access is limited to files inside it.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The directory to retrieve the contents from, relative to the working directory. If not provided, retrieve files in the working directory itself.",
+            ),
+        },
+    ),
+)
+
+
+
 
 def get_file_content(working_directory, file_path):
 	working_directory_abs = os.path.abspath(working_directory)
