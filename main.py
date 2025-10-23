@@ -3,12 +3,12 @@ from dotenv import load_dotenv
 from google import genai
 import sys
 from google.genai import types
-from config import SYS_PROMPT as system_prompt
+from config import SYS_PROMPT as system_prompt 
 from functions.get_files_info import schema_get_files_info
 from functions.get_file_content import schema_get_file_content
 from functions.run_python_file import schema_run_python_file
 from functions.write_file import schema_write_file
-
+from call_function import call_function
 
 
 
@@ -19,10 +19,9 @@ available_functions = types.Tool(
         schema_get_files_info,
         schema_get_file_content,
         schema_run_python_file,
-        schema_write_file
+        schema_write_file,
     ]
 )
-
 
 
 if len(sys.argv) > 2 and sys.argv[2]!= "--verbose":
@@ -57,6 +56,8 @@ messages = [
 
 
 
+
+
 def generate_content(ai_model, messages, verbose):
 
 
@@ -66,25 +67,17 @@ def generate_content(ai_model, messages, verbose):
     	tools=[available_functions], system_instruction=system_prompt)
 	)
 
-	for fc in response.function_calls or []:
-		name = fc.name
-		args = dict(fc.args)
-
-
-
-	if fc:
-		if verbose == True:
+	if verbose == True:
 			print(f"""User prompt: {user_prompt} \n
 				Prompt tokens: {response.usage_metadata.prompt_token_count}
 				Response tokens: {response.usage_metadata.candidates_token_count}
 				""")
-			print(f"Calling function: {fc.name}({fc.args})")
-		else:
-			print(f"Calling function: {fc.name}({fc.args})")
-			print(response.text)
 
+	if response.function_calls:
+		for fc in response.function_calls:
+			result = call_function(fc, verbose)
+			print(result)
 	else:
-		print(f"Calling function: {fc.name}({fc.args})")
 		print(response.text)
 
 

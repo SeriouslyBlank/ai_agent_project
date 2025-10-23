@@ -9,9 +9,18 @@ schema_run_python_file = types.FunctionDeclaration(
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "directory": types.Schema(
+            "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="The directory to run the file from, relative to the working directory. If not provided, lists files in the working directory itself.",
+                description="The file to run the file from, relative to the working directory."),
+
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="Optional array of strings to be used as cli args for python file",
+                items=types.Schema(
+                	type= types.Type.STRING,
+
+                	),
+
             ),
         },
     ),

@@ -4,13 +4,13 @@ from google.genai import types
 
 schema_write_file = types.FunctionDeclaration(
     name="write_file",
-    description = "Writes the file, relative to the working directory. Must be located within the working directory.",
+    description = "Overwrites or Writes the file, relative to the working directory. Must be located within the working directory.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
             "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="The file path to write the file, relative to the working directory. If not provided, writes file in the working directory itself.",
+                description="The file path to write the file, relative to the working directory.",
 
             ),
             "content": types.Schema(
